@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500" prefWidth="1000" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.integradora3apo.control.HelloController">
+   <children>
+      <ImageView fitHeight="-Infinity" fitWidth="-Infinity" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@TankBattle.png" />
+         </image>
+         <viewport>
+            <Rectangle2D height="700.0" width="1000.0" />
+         </viewport>
+      </ImageView>
+      <Button fx:id="startGame" layoutX="500.0" layoutY="364.0" mnemonicParsing="false" onAction="#startGame" prefHeight="91.0" prefWidth="187.0" style="-fx-background-color: transparent;" text="INICIAR PARTIDA">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@start.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <TextField fx:id="textUsuario1" layoutX="306.0" layoutY="313.0" promptText="Usuario 1" style="-fx-background-color: #808080;" />
+      <TextField fx:id="textUsuario2" layoutX="764.0" layoutY="313.0" promptText="Usuario 2" style="-fx-background-color: #808080;" />
+      <SplitMenuButton fx:id="tankColorUser1" layoutX="306.0" layoutY="352.0" mnemonicParsing="false" style="-fx-background-color: #808080;" text="Choose tank color">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </SplitMenuButton>
+      <SplitMenuButton fx:id="tankColorUser2" layoutX="764.0" layoutY="352.0" mnemonicParsing="false" style="-fx-background-color: #808080;" text="Choose tank color">
+         <items>
+            <MenuItem mnemonicParsing="false" text="Action 1" />
+            <MenuItem mnemonicParsing="false" text="Action 2" />
+         </items>
+      </SplitMenuButton>
+   </children>
+</Pane>

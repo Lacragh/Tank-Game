@@ -20,12 +20,12 @@ public class Avatar {
 
     public int live = 5;
 
-    public Avatar(Canvas canvas) {
+    public Avatar(Canvas canvas, String imageName, double startX, double startY) {
         this.canvas = canvas;
         gc = canvas.getGraphicsContext2D();
-        String uri = "file:" + HelloApplication.class.getResource("tanqueJugador1.png").getPath();
+        String uri = "file:" + HelloApplication.class.getResource(imageName).getPath();
         tank = new Image(uri);
-        pos = new Vector(100, 100);
+        pos = new Vector(startX, startY);
         direction = new Vector(2, 2);
     }
 

@@ -2,6 +2,7 @@ package com.example.integradora3apo.control;
 
 import com.example.integradora3apo.HelloApplication;
 import com.example.integradora3apo.model.*;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,11 +13,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import javax.print.attribute.standard.Media;
-import javax.print.attribute.standard.MediaTray;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -26,48 +24,29 @@ import java.util.ResourceBundle;
 
 public class GameController implements Initializable {
 
-
-    //Variables globales de la ventana
-    @FXML
-    private Canvas canvas;
+    @FXML private Canvas canvas;
     private GraphicsContext gc;
     private boolean isRunning = true;
+    private AnimationTimer gameLoop;
 
     private boolean player1Dead = false;
-    @FXML
-    private ImageView liveImage;
+    @FXML private ImageView liveImage;
+    @FXML private ImageView bulletImage;
+    @FXML private ImageView bulletImage2;
+    @FXML private Label labelName1;
+    @FXML private Label labelName2;
+    @FXML private ImageView liveImage2;
 
-    @FXML
-    private ImageView bulletImage;
-
-    @FXML
-    private ImageView bulletImage2;
-
-    @FXML
-    private Label labelName1;
-
-    @FXML
-    private Label labelName2;
-    @FXML
-    private ImageView liveImage2;
-
-    //Elementos gráficos
-    private Avatar avatar;
-    private AvatarTwo avatar2;
     private Avatar enemy;
     private Image fondo;
 
-    private ArrayList<Enemy> enemies;
-
     private ArrayList<Avatar> avatars;
-    private ArrayList<AvatarTwo> avatarTwos;
+    private ArrayList<Avatar> avatarTwos;
     private ArrayList<Bullet> bullets1;
     private ArrayList<Bullet> bullets2;
     private ArrayList<Bullet> bulletCPU;
     private ArrayList<Wall> walls;
 
-
-    //Estados de las teclas
     boolean Wpressed = false;
     boolean Apressed = false;
     boolean Spressed = false;
@@ -80,753 +59,403 @@ public class GameController implements Initializable {
 
     public void generateMap() {
         walls = new ArrayList<>();
-
-        for (int i = 350; i >= 100; i += -50) {
-            Wall wall1 = new Wall(350, i, canvas);
-            walls.add(wall1);
-        }
-
-        //horizontal
-        for (int i = 350; i < 600; i += 50) {
-            Wall wall1 = new Wall(i, 100, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared vertical fondo arriba
-        for (int i = 0; i < 250; i += 50) {
-            Wall wall1 = new Wall(800, i, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared vertical fondo medio
-        for (int i = 350; i < 400; i += 50) {
-            Wall wall1 = new Wall(800, i, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared vertical fondo abajo
-        for (int i = 550; i <= canvas.getHeight(); i += 50) {
-            Wall wall1 = new Wall(750, i, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared vertical primera abajo
-        for (int i = 550; i <= canvas.getHeight(); i += 50) {
-            Wall wall1 = new Wall(150, i, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared horizontal fondo arriba
-        for (int i = 950; i <= 1000; i += 50) {
-            Wall wall1 = new Wall(i, 150, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared horizontal fondo abajo
-        for (int i = 1000; i <= canvas.getWidth(); i += 50) {
-            Wall wall1 = new Wall(i, 500, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared horizontal medio abajo
-        for (int i = 400; i <= 450; i += 50) {
-            Wall wall1 = new Wall(i, 500, canvas);
-            walls.add(wall1);
-        }
-
-        //Pared vertical medio abajo
-        for (int i = 450; i <= 450; i += 50) {
-            Wall wall1 = new Wall(450, i, canvas);
-            walls.add(wall1);
-        }
-
-        for (int i = 200; i > 50; i += -50) {
-            Wall wall1 = new Wall(i, 400, canvas);
-            walls.add(wall1);
-        }
-
-        //modifica primera pared vertical
-        for (int i = 0; i < 100; i += 50) {
-            Wall wall1 = new Wall(150, i, canvas);
-            walls.add(wall1);
-        }
-
-        //Modifica primera pared vertical parte2
-        for (int i = 200; i <= 250; i += 50) {
-            Wall wall1 = new Wall(150, i, canvas);
-            walls.add(wall1);
-        }
-
-        for (int i = 200; i <= 400; i += 50) {
-            Wall wall1 = new Wall(650, i, canvas);
-            walls.add(wall1);
-        }
-
-        for (int i = 650; i >= 550; i += -50) {
-            Wall wall1 = new Wall(i, 350, canvas);
-            walls.add(wall1);
-        }
-
-        for (int i = 700; i < 1000; i += 50) {
-            Wall wall1 = new Wall(i, 350, canvas);
-            walls.add(wall1);
-        }
-
-
+        // Using original logic for generating map to keep the same level design
+        for (int i = 350; i >= 100; i += -50) walls.add(new Wall(350, i, canvas));
+        for (int i = 350; i < 600; i += 50) walls.add(new Wall(i, 100, canvas));
+        for (int i = 0; i < 250; i += 50) walls.add(new Wall(800, i, canvas));
+        for (int i = 350; i < 400; i += 50) walls.add(new Wall(800, i, canvas));
+        for (int i = 550; i <= canvas.getHeight(); i += 50) walls.add(new Wall(750, i, canvas));
+        for (int i = 550; i <= canvas.getHeight(); i += 50) walls.add(new Wall(150, i, canvas));
+        for (int i = 950; i <= 1000; i += 50) walls.add(new Wall(i, 150, canvas));
+        for (int i = 1000; i <= canvas.getWidth(); i += 50) walls.add(new Wall(i, 500, canvas));
+        for (int i = 400; i <= 450; i += 50) walls.add(new Wall(i, 500, canvas));
+        for (int i = 450; i <= 450; i += 50) walls.add(new Wall(450, i, canvas));
+        for (int i = 200; i > 50; i += -50) walls.add(new Wall(i, 400, canvas));
+        for (int i = 0; i < 100; i += 50) walls.add(new Wall(150, i, canvas));
+        for (int i = 200; i <= 250; i += 50) walls.add(new Wall(150, i, canvas));
+        for (int i = 200; i <= 400; i += 50) walls.add(new Wall(650, i, canvas));
+        for (int i = 650; i >= 550; i += -50) walls.add(new Wall(i, 350, canvas));
+        for (int i = 700; i < 1000; i += 50) walls.add(new Wall(i, 350, canvas));
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         gc = canvas.getGraphicsContext2D();
         canvas.setFocusTraversable(true);
-        System.out.println(AvatarData.getInstance().getNamesPlayer1());
         generateMap();
+        
         String uri = "file:" + HelloApplication.class.getResource("topDownArenaView.png").getPath();
-        enemy = new Avatar(canvas);
+        fondo = new Image(uri);
+
         labelName1.setText(AvatarData.getInstance().getNamesPlayer1());
         labelName2.setText(AvatarData.getInstance().getNamesPlayer2());
-        bulletCPU = new ArrayList<>();
-        fondo = new Image(uri);
-        enemies = new ArrayList<>();
-        avatars = new ArrayList<>();
-        enemy.ammo = 0;
 
-        avatars.add(new Avatar(canvas));
+        avatars = new ArrayList<>();
+        avatars.add(new Avatar(canvas, "tanqueJugador1.png", 100, 100));
 
         avatarTwos = new ArrayList<>();
-        avatarTwos.add(new AvatarTwo(canvas));
+        avatarTwos.add(new Avatar(canvas, "tanqueJugador2.png", 900, 500));
+
+        enemy = new Avatar(canvas, "tanqueJugador1.png", 1000, 300);
+        enemy.ammo = 0;
+
         bullets1 = new ArrayList<>();
         bullets2 = new ArrayList<>();
-        enemy.setPosition(1000,300);
-
-
+        bulletCPU = new ArrayList<>();
 
         canvas.setOnKeyPressed(this::onKeyPressed);
         canvas.setOnKeyReleased(this::onKeyReleased);
         draw();
-
     }
 
     public void draw() {
-        new Thread(
-                () -> {
-                    while (isRunning) {
-                        Platform.runLater(() -> {
+        gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (!isRunning) {
+                    this.stop();
+                    return;
+                }
+                
+                gc.drawImage(fondo, 0, 0, canvas.getWidth(), canvas.getHeight());
 
-                            gc.drawImage(fondo, 0, 0, canvas.getWidth(), canvas.getHeight());
+                if (!avatars.isEmpty()) {
+                    avatars.get(0).draw();
+                    showLife(avatars.get(0), liveImage);
+                } else {
+                    setDeadImage(liveImage);
+                }
 
-                            if (avatars.size() != 0) {
+                if (!avatarTwos.isEmpty()) {
+                    avatarTwos.get(0).draw();
+                    showLife(avatarTwos.get(0), liveImage2);
+                } else {
+                    setDeadImage(liveImage2);
+                }
 
-                                avatars.get(0).draw();
-                                showLifePlayer1();
-                            } else {
-                                String uri = "file:" + HelloApplication.class.getResource("dead.png").getPath();
-                                Image live = new Image(uri);
-                                liveImage.setImage(live);
-                            }
-
-                            if (avatarTwos.size() != 0) {
-                                avatarTwos.get(0).draw();
-                                showLifePlayer2();
-                            } else {
-                                String uri = "file:" + HelloApplication.class.getResource("dead.png").getPath();
-                                Image live = new Image(uri);
-                                liveImage2.setImage(live);
-                            }
-
-
-                            for (int i = 0; i < walls.size(); i++) {
-                                if (walls.get(i).damage == 0) {
-                                    walls.remove(i);
-                                }
-                                walls.get(i).draw();
-                            }
-
-                            //Pintar enemigos
-                            if (enemy != null) {
-                                if(avatars.size() != 0){
-                                    double componentX = (avatars.get(0).pos.x - enemy.pos.x);
-                                    double componentY = (avatars.get(0).pos.y - enemy.pos.y);
-                                    double rule = Math.sqrt(Math.pow(componentX, 2) + Math.pow(componentY, 2));
-                                    enemy.direction.x = componentX / rule;
-                                    enemy.direction.y = componentY / rule;
-                                } else if (avatarTwos.size() != 0) {
-                                    double componentX = (avatarTwos.get(0).pos.x - enemy.pos.x);
-                                    double componentY = (avatarTwos.get(0).pos.y - enemy.pos.y);
-                                    double rule = Math.sqrt(Math.pow(componentX, 2) + Math.pow(componentY, 2));
-                                    enemy.direction.x = componentX / rule;
-                                    enemy.direction.y = componentY / rule;
-                                }
-
-                                shootCPU();
-                            }
-
-
-                            //Balas disparos
-                            for (int i = 0; i < bullets1.size(); i++) {
-                                bullets1.get(i).draw();
-                                if (bullets1.get(i).pos.x > canvas.getWidth() + 20 ||
-                                        bullets1.get(i).pos.y > canvas.getHeight() + 20 ||
-                                        bullets1.get(i).pos.y < -20 ||
-                                        bullets1.get(i).pos.x < -20) {
-                                    bullets1.remove(i);
-                                }
-
-                            }
-
-                            for (int i = 0; i < bullets2.size(); i++) {
-                                bullets2.get(i).draw();
-                                if (bullets2.get(i).pos.x > canvas.getWidth() + 20 ||
-                                        bullets2.get(i).pos.y > canvas.getHeight() + 20 ||
-                                        bullets2.get(i).pos.y < -20 ||
-                                        bullets2.get(i).pos.x < -20) {
-                                    bullets2.remove(i);
-                                }
-
-                            }
-
-
-                            for (int i = 0; i < bullets1.size(); i++) {
-                                for (int j = 0; j < walls.size(); j++) {
-                                    if (bullets1.get(i).circle.intersects(walls.get(j).rectangle.getBoundsInParent())) {
-                                        bullets1.remove(i);
-                                        walls.get(j).damage--;
-                                    }
-                                }
-                            }
-                            for (int i = 0; i < bullets2.size(); i++) {
-                                for (int j = 0; j < walls.size(); j++) {
-                                    if (bullets2.get(i).circle.intersects(walls.get(j).rectangle.getBoundsInParent())) {
-                                        bullets2.remove(i);
-                                        walls.get(j).damage--;
-                                    }
-                                }
-                            }
-
-                            //Colisiones
-                            //detectCollission();
-
-                            if(WinOrLose() != 0){
-                                HelloApplication.showWindow("gano.fxml");
-                                Stage currentStage = (Stage) canvas.getScene().getWindow();
-                                currentStage.hide();
-                                isRunning =false;
-                            }
-                            detectDamage();
-                            showAmmoPlayer1();
-                            showAmmoPlayer2();
-                            doKeyboardActions();
-                            doKeyboardActions2();
-                        });
-                        //Sleep
-                        try {
-                            Thread.sleep(30);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+                for (int i = walls.size() - 1; i >= 0; i--) {
+                    if (walls.get(i).damage == 0) {
+                        walls.remove(i);
+                    } else {
+                        walls.get(i).draw();
                     }
                 }
-        ).start();
 
+                if (enemy != null) {
+                    Avatar target = null;
+                    if (!avatars.isEmpty()) target = avatars.get(0);
+                    else if (!avatarTwos.isEmpty()) target = avatarTwos.get(0);
+
+                    if (target != null) {
+                        double compX = target.pos.x - enemy.pos.x;
+                        double compY = target.pos.y - enemy.pos.y;
+                        double dist = Math.sqrt(compX * compX + compY * compY);
+                        if (dist > 0) {
+                            enemy.direction.x = compX / dist;
+                            enemy.direction.y = compY / dist;
+                        }
+                    }
+                    shootCPU();
+                }
+
+                updateBullets(bullets1);
+                updateBullets(bullets2);
+                
+                checkBulletWallCollisions(bullets1);
+                checkBulletWallCollisions(bullets2);
+
+                detectDamage();
+                
+                if (!avatars.isEmpty()) showAmmo(avatars.get(0), bulletImage);
+                if (!avatarTwos.isEmpty()) showAmmo(avatarTwos.get(0), bulletImage2);
+
+                if (!avatars.isEmpty()) doKeyboardActions();
+                if (!avatarTwos.isEmpty()) doKeyboardActions2();
+
+                if (WinOrLose() != 0) {
+                    gameLoop.stop();
+                    isRunning = false;
+                    HelloApplication.showWindow("gano.fxml");
+                    Stage currentStage = (Stage) canvas.getScene().getWindow();
+                    currentStage.hide();
+                }
+            }
+        };
+        gameLoop.start();
+    }
+    
+    private void setDeadImage(ImageView imgView) {
+        String uri = "file:" + HelloApplication.class.getResource("dead.png").getPath();
+        imgView.setImage(new Image(uri));
     }
 
-    private int WinOrLose(){
-        int count=0;
-        if(avatars.size()==0 && enemy == null){
-            count = 1;
-            isRunning = false;
-            return count;
-        }else if(avatarTwos.size()==0 && enemy==null){
-            count = 2;
-            isRunning = false;
-            return count;
-        }else if(avatars.size()==0 && avatarTwos.size()==0) {
-            count = 3;
-            isRunning = false;
-            return count;
+    private void updateBullets(ArrayList<Bullet> list) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            Bullet b = list.get(i);
+            b.draw();
+            if (b.pos.x > canvas.getWidth() + 20 || b.pos.y > canvas.getHeight() + 20 ||
+                b.pos.x < -20 || b.pos.y < -20) {
+                list.remove(i);
+            }
         }
+    }
 
+    private void checkBulletWallCollisions(ArrayList<Bullet> list) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            boolean hit = false;
+            for (int j = walls.size() - 1; j >= 0; j--) {
+                if (list.get(i).circle.intersects(walls.get(j).rectangle.getBoundsInParent())) {
+                    walls.get(j).damage--;
+                    hit = true;
+                    break;
+                }
+            }
+            if (hit) list.remove(i);
+        }
+    }
 
-        return count;
+    private int WinOrLose() {
+        if (avatars.isEmpty() && enemy == null) return 1;
+        if (avatarTwos.isEmpty() && enemy == null) return 2;
+        if (avatars.isEmpty() && avatarTwos.isEmpty()) return 3;
+        return 0;
     }
 
     private void detectDamage() {
-        if (avatarTwos.size() != 0) {
-
-            for (int i = 0; i < bullets1.size(); i++) {
+        if (!avatarTwos.isEmpty()) {
+            for (int i = bullets1.size() - 1; i >= 0; i--) {
                 if (bullets1.get(i).circle.intersects(avatarTwos.get(0).rectangle.getBoundsInParent())) {
                     avatarTwos.get(0).live--;
-                    if (avatarTwos.get(0).live == 0) {
-                        avatarTwos.remove(0);
-                    }
-                    bullets1.remove(i);
-                }
-            }
-
-
-        }
-
-        if (enemy != null){
-            for (int i = 0; i < bullets2.size(); i++) {
-                if (bullets2.get(i).circle.intersects(enemy.rectangle.getBoundsInParent())) {
-                    enemy.live--;
-                    if (enemy.live == 0) {
-                        enemy = null;
-
-                    }
-                    bullets2.remove(i);
-                }
-            }
-
-            for (int i = 0; i < bullets1.size(); i++) {
-                if (bullets1.get(i).circle.intersects(enemy.rectangle.getBoundsInParent())) {
-                    enemy.live--;
-                    if (enemy.live == 0) {
-                        enemy = null;
-                    }
+                    if (avatarTwos.get(0).live <= 0) avatarTwos.remove(0);
                     bullets1.remove(i);
                 }
             }
         }
 
+        if (enemy != null) {
+            checkEnemyHit(bullets1);
+            checkEnemyHit(bullets2);
+        }
 
-        if (avatars.size() != 0) {
-            for (int i = 0; i < bullets2.size(); i++) {
+        if (!avatars.isEmpty()) {
+            for (int i = bullets2.size() - 1; i >= 0; i--) {
                 if (bullets2.get(i).circle.intersects(avatars.get(0).rectangle.getBoundsInParent())) {
                     avatars.get(0).live--;
-                    if (avatars.get(0).live == 0) {
+                    if (avatars.get(0).live <= 0) {
                         avatars.remove(0);
                         player1Dead = true;
                     }
-
                     bullets2.remove(i);
                 }
             }
         }
-
+    }
+    
+    private void checkEnemyHit(ArrayList<Bullet> list) {
+        if (enemy == null) return;
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (list.get(i).circle.intersects(enemy.rectangle.getBoundsInParent())) {
+                enemy.live--;
+                if (enemy.live <= 0) enemy = null;
+                list.remove(i);
+                break;
+            }
+        }
     }
 
     private void doKeyboardActions() {
+        Avatar player = avatars.get(0);
         boolean stopFlag = false;
         if (Wpressed) {
-            for (int i = 0; i < walls.size(); i++) {
-
-                if (walls.get(i).rectangle.intersects(avatars.get(0).pos.x + avatars.get(0).direction.x - 25, avatars.get(0).pos.y + avatars.get(0).direction.y - 25, 50, 50)) {
-
+            for (Wall wall : walls) {
+                if (wall.rectangle.intersects(player.pos.x + player.direction.x - 25, player.pos.y + player.direction.y - 25, 50, 50)) {
                     stopFlag = true;
-
                 }
-
             }
-            if (!stopFlag) {
-                avatars.get(0).moveForward();
-            }
-
+            if (!stopFlag) player.moveForward();
         }
-        if (Apressed) {
-            avatars.get(0).changeAngle(-6);
-        }
+        if (Apressed) player.changeAngle(-6);
         if (Spressed) {
-            for (int i = 0; i < walls.size(); i++) {
-                if (walls.get(i).rectangle.intersects(avatars.get(0).pos.x - avatars.get(0).direction.x - 30, avatars.get(0).pos.y - avatars.get(0).direction.y - 30, 50, 50)) {
+            for (Wall wall : walls) {
+                if (wall.rectangle.intersects(player.pos.x - player.direction.x - 30, player.pos.y - player.direction.y - 30, 50, 50)) {
                     stopFlag = true;
                 }
-
             }
-            if (!stopFlag) {
-                avatars.get(0).moveBackward();
-            }
-
+            if (!stopFlag) player.moveBackward();
         }
-        if (Dpressed) {
-            avatars.get(0).changeAngle(6);
-        }
+        if (Dpressed) player.changeAngle(6);
     }
 
     private void doKeyboardActions2() {
-        boolean stopFlag2 = false;
+        Avatar player = avatarTwos.get(0);
+        boolean stopFlag = false;
         if (UPpressed) {
-            for (int i = 0; i < walls.size(); i++) {
-
-                if (walls.get(i).rectangle.intersects(avatarTwos.get(0).pos.x + avatarTwos.get(0).direction.x - 25, avatarTwos.get(0).pos.y + avatarTwos.get(0).direction.y - 25, 50, 50)) {
-                    stopFlag2 = true;
+            for (Wall wall : walls) {
+                if (wall.rectangle.intersects(player.pos.x + player.direction.x - 25, player.pos.y + player.direction.y - 25, 50, 50)) {
+                    stopFlag = true;
                 }
-
             }
-            if (!stopFlag2) {
-                avatarTwos.get(0).moveForward();
-            }
-
+            if (!stopFlag) player.moveForward();
         }
-        if (LEFTpressed) {
-            avatarTwos.get(0).changeAngle(-6);
-        }
+        if (LEFTpressed) player.changeAngle(-6);
         if (DOWNpressed) {
-            for (int i = 0; i < walls.size(); i++) {
-                if (walls.get(i).rectangle.intersects(avatarTwos.get(0).pos.x - avatarTwos.get(0).direction.x - 30, avatarTwos.get(0).pos.y - avatarTwos.get(0).direction.y - 30, 50, 50)) {
-                    stopFlag2 = true;
+            for (Wall wall : walls) {
+                if (wall.rectangle.intersects(player.pos.x - player.direction.x - 30, player.pos.y - player.direction.y - 30, 50, 50)) {
+                    stopFlag = true;
                 }
-
             }
-            if (!stopFlag2) {
-                avatarTwos.get(0).moveBackward();
-            }
-
+            if (!stopFlag) player.moveBackward();
         }
-        if (RIGHTpressed) {
-            avatarTwos.get(0).changeAngle(6);
-        }
+        if (RIGHTpressed) player.changeAngle(6);
     }
 
     private void onKeyReleased(KeyEvent keyEvent) {
-        //Tank 1
-        if (keyEvent.getCode() == KeyCode.W) {
-            Wpressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.A) {
-            Apressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.S) {
-            Spressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.D) {
-            Dpressed = false;
-        }
+        if (keyEvent.getCode() == KeyCode.W) Wpressed = false;
+        if (keyEvent.getCode() == KeyCode.A) Apressed = false;
+        if (keyEvent.getCode() == KeyCode.S) Spressed = false;
+        if (keyEvent.getCode() == KeyCode.D) Dpressed = false;
 
-        //Tank 2
-        if (keyEvent.getCode() == KeyCode.UP) {
-            UPpressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.LEFT) {
-            LEFTpressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.DOWN) {
-            DOWNpressed = false;
-        }
-        if (keyEvent.getCode() == KeyCode.RIGHT) {
-            RIGHTpressed = false;
-        }
+        if (keyEvent.getCode() == KeyCode.UP) UPpressed = false;
+        if (keyEvent.getCode() == KeyCode.LEFT) LEFTpressed = false;
+        if (keyEvent.getCode() == KeyCode.DOWN) DOWNpressed = false;
+        if (keyEvent.getCode() == KeyCode.RIGHT) RIGHTpressed = false;
     }
 
     private void onKeyPressed(KeyEvent keyEvent) {
-        //Tank 1
-
-        if (keyEvent.getCode() == KeyCode.W) {
-            Wpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.A) {
-            Apressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.S) {
-            Spressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.D) {
-            Dpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.SPACE) {
-            Bullet bullet = new Bullet(canvas,
-                    new Vector(avatars.get(0).pos.x, avatars.get(0).pos.y),
-                    new Vector(2 * avatars.get(0).direction.x, 2 * avatars.get(0).direction.y));
-            if (avatars.get(0).ammo != 0) {
-                bullets1.add(bullet);
-                avatars.get(0).ammo--;
+        if (keyEvent.getCode() == KeyCode.W) Wpressed = true;
+        if (keyEvent.getCode() == KeyCode.A) Apressed = true;
+        if (keyEvent.getCode() == KeyCode.S) Spressed = true;
+        if (keyEvent.getCode() == KeyCode.D) Dpressed = true;
+        
+        if (keyEvent.getCode() == KeyCode.SPACE && !avatars.isEmpty()) {
+            Avatar player = avatars.get(0);
+            if (player.ammo > 0) {
+                bullets1.add(new Bullet(canvas, new Vector(player.pos.x, player.pos.y), new Vector(2 * player.direction.x, 2 * player.direction.y)));
+                player.ammo--;
             }
-
         }
-        if (keyEvent.getCode() == KeyCode.R) {
+        if (keyEvent.getCode() == KeyCode.R && !avatars.isEmpty()) {
             avatars.get(0).ammo = 5;
             soundRecharge();
         }
 
-        //Tank 2
-        System.out.println(keyEvent.getCode());
-        if (keyEvent.getCode() == KeyCode.UP) {
-            UPpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.LEFT) {
-            LEFTpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.DOWN) {
-            DOWNpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.RIGHT) {
-            RIGHTpressed = true;
-        }
-        if (keyEvent.getCode() == KeyCode.CONTROL) {
-            Bullet bullet = new Bullet(canvas,
-                    new Vector(avatarTwos.get(0).pos.x, avatarTwos.get(0).pos.y),
-                    new Vector(2 * avatarTwos.get(0).direction.x, 2 * avatarTwos.get(0).direction.y));
-            if (avatarTwos.get(0).ammo != 0) {
-                bullets2.add(bullet);
-                avatarTwos.get(0).ammo--;
+        if (keyEvent.getCode() == KeyCode.UP) UPpressed = true;
+        if (keyEvent.getCode() == KeyCode.LEFT) LEFTpressed = true;
+        if (keyEvent.getCode() == KeyCode.DOWN) DOWNpressed = true;
+        if (keyEvent.getCode() == KeyCode.RIGHT) RIGHTpressed = true;
+        
+        if (keyEvent.getCode() == KeyCode.CONTROL && !avatarTwos.isEmpty()) {
+            Avatar player = avatarTwos.get(0);
+            if (player.ammo > 0) {
+                bullets2.add(new Bullet(canvas, new Vector(player.pos.x, player.pos.y), new Vector(2 * player.direction.x, 2 * player.direction.y)));
+                player.ammo--;
             }
         }
-        if (keyEvent.getCode() == KeyCode.SHIFT) {
+        if (keyEvent.getCode() == KeyCode.SHIFT && !avatarTwos.isEmpty()) {
             avatarTwos.get(0).ammo = 5;
             soundRecharge();
         }
     }
 
-    private void showLifePlayer1() {
-
-        if(avatars.size() != 0){
-            if (avatars.get(0).live == 5) {
-                String uri = "file:" + HelloApplication.class.getResource("fullLive.png").getPath();
-                Image live = new Image(uri);
-                liveImage.setImage(live);
-            }
-            if (avatars.get(0).live == 4) {
-                String uri = "file:" + HelloApplication.class.getResource("fourHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage.setImage(live);
-            }
-            if (avatars.get(0).live == 3) {
-                String uri = "file:" + HelloApplication.class.getResource("threeHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage.setImage(live);
-            }
-            if (avatars.get(0).live == 2) {
-                String uri = "file:" + HelloApplication.class.getResource("twoHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage.setImage(live);
-            }
-            if (avatars.get(0).live == 1) {
-                String uri = "file:" + HelloApplication.class.getResource("oneHeart.png").getPath();
-                Image live = new Image(uri);
-                liveImage.setImage(live);
-            }
-        }
-
+    private void showLife(Avatar player, ImageView imgView) {
+        String filename = "fullLive.png";
+        if (player.live == 4) filename = "fourHearts.png";
+        else if (player.live == 3) filename = "threeHearts.png";
+        else if (player.live == 2) filename = "twoHearts.png";
+        else if (player.live == 1) filename = "oneHeart.png";
+        else if (player.live <= 0) filename = "dead.png";
+        
+        String uri = "file:" + HelloApplication.class.getResource(filename).getPath();
+        imgView.setImage(new Image(uri));
     }
 
-    private void showLifePlayer2() {
-
-        if(avatarTwos.size() != 0){
-            if (avatarTwos.get(0).live == 5) {
-                String uri = "file:" + HelloApplication.class.getResource("fullLive.png").getPath();
-                Image live = new Image(uri);
-                liveImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).live == 4) {
-                String uri = "file:" + HelloApplication.class.getResource("fourHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).live == 3) {
-                String uri = "file:" + HelloApplication.class.getResource("threeHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).live == 2) {
-                String uri = "file:" + HelloApplication.class.getResource("twoHearts.png").getPath();
-                Image live = new Image(uri);
-                liveImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).live == 1) {
-                String uri = "file:" + HelloApplication.class.getResource("oneHeart.png").getPath();
-                Image live = new Image(uri);
-                liveImage2.setImage(live);
-            }
-        }
-
+    private void showAmmo(Avatar player, ImageView imgView) {
+        String filename = "ammo.png";
+        if (player.ammo == 4) filename = "fourBullets.png";
+        else if (player.ammo == 3) filename = "threeBullets.png";
+        else if (player.ammo == 2) filename = "twoBullets.png";
+        else if (player.ammo == 1) filename = "oneBullet.png";
+        else if (player.ammo <= 0) filename = "reloadIcon.png";
+        
+        String uri = "file:" + HelloApplication.class.getResource(filename).getPath();
+        imgView.setImage(new Image(uri));
     }
 
-    private void showAmmoPlayer1() {
-
-        if(avatars.size() != 0){
-            if (avatars.get(0).ammo == 5) {
-                String uri = "file:" + HelloApplication.class.getResource("ammo.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-            if (avatars.get(0).ammo == 4) {
-                String uri = "file:" + HelloApplication.class.getResource("fourBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-            if (avatars.get(0).ammo == 3) {
-                String uri = "file:" + HelloApplication.class.getResource("threeBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-            if (avatars.get(0).ammo == 2) {
-                String uri = "file:" + HelloApplication.class.getResource("twoBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-            if (avatars.get(0).ammo == 1) {
-                String uri = "file:" + HelloApplication.class.getResource("oneBullet.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-
-            if(avatars.get(0).ammo == 0){
-                String uri = "file:" + HelloApplication.class.getResource("reloadIcon.png").getPath();
-                Image live = new Image(uri);
-                bulletImage.setImage(live);
-            }
-        }
-
-    }
-
-    private void showAmmoPlayer2() {
-
-        if(avatarTwos.size() != 0){
-            if (avatarTwos.get(0).ammo == 5) {
-                String uri = "file:" + HelloApplication.class.getResource("ammo.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).ammo == 4) {
-                String uri = "file:" + HelloApplication.class.getResource("fourBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).ammo == 3) {
-                String uri = "file:" + HelloApplication.class.getResource("threeBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).ammo == 2) {
-                String uri = "file:" + HelloApplication.class.getResource("twoBullets.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-            if (avatarTwos.get(0).ammo == 1) {
-                String uri = "file:" + HelloApplication.class.getResource("oneBullet.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-
-            if(avatarTwos.get(0).ammo == 0){
-                String uri = "file:" + HelloApplication.class.getResource("reloadIcon.png").getPath();
-                Image live = new Image(uri);
-                bulletImage2.setImage(live);
-            }
-        }
-
-
-    }
-
-    private void soundRecharge(){
-        String uri = HelloApplication.class.getResource("maxAmmo.wav").getPath();
-        File musicPath = new File(uri);
-
-        if(musicPath.exists()){
-
+    private void soundRecharge() {
+        URL resource = HelloApplication.class.getResource("maxAmmo.wav");
+        if (resource == null) return;
+        File musicPath = new File(resource.getPath());
+        if (musicPath.exists()) {
             try {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInput);
                 clip.start();
-
-            } catch (UnsupportedAudioFileException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (LineUnavailableException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }else {
-            System.out.println("No existe");
         }
     }
 
     private void shootCPU() {
+        if (enemy == null) return;
+        enemy.draw();
 
-        new Thread(() -> {
-            if (enemy != null){
-                enemy.draw();
+        boolean stopflag = false;
+        for (Wall wall : walls) {
+            if (wall.rectangle.intersects(enemy.rectangle.getBoundsInParent())) {
+                stopflag = true;
+                if (enemy.ammo == 0) {
+                    bulletCPU.add(new Bullet(canvas, new Vector(enemy.pos.x, enemy.pos.y), new Vector(5 * enemy.direction.x, 5 * enemy.direction.y)));
+                    enemy.ammo = 1;
+                }
+                break;
             }
+        }
 
-            boolean stopflag = false;
-            boolean stopBullets = false;
-            for (int i = 0; i < walls.size() ; i++) {
-                if (walls.get(i).rectangle.intersects(enemy.rectangle.getBoundsInParent())) {
-
-                    stopflag = true;
-                    Bullet bullet = new Bullet(canvas,
-                            new Vector(enemy.pos.x, enemy.pos.y),
-                            new Vector(5 * enemy.direction.x, 5 * enemy.direction.y));
-                    if(enemy.ammo == 0){
-                        bulletCPU.add(bullet);
-                        enemy.ammo = 1;
-
-                    }
-
+        for (int i = bulletCPU.size() - 1; i >= 0; i--) {
+            Bullet b = bulletCPU.get(i);
+            b.draw();
+            boolean hit = false;
+            for (Wall wall : walls) {
+                if (b.circle.intersects(wall.rectangle.getBoundsInParent())) {
+                    wall.damage--;
+                    hit = true;
+                    break;
                 }
             }
-
-            for (int i = 0; i < bulletCPU.size(); i++) {
-                bulletCPU.get(0).draw();
-                for (int j = 0; j < walls.size() ; j++) {
-                    if(bulletCPU.get(i).circle.intersects(walls.get(j).rectangle.getBoundsInParent())){
-                        walls.get(j).damage--;
-                        bulletCPU.remove(i);
-                        enemy.ammo = 0;
-                    }
-                }
+            if (hit) {
+                bulletCPU.remove(i);
+                enemy.ammo = 0;
+                continue;
             }
-            for (int i = 0; i < bulletCPU.size(); i++) {
-                if (bulletCPU.get(i).pos.x > canvas.getWidth() + 20 ||
-                        bulletCPU.get(i).pos.y > canvas.getHeight() + 20 ||
-                        bulletCPU.get(i).pos.y < -20 ||
-                        bulletCPU.get(i).pos.x < -20) {
-                    bulletCPU.remove(i);
-                    enemy.ammo = 0;
-                }
-
+            
+            if (b.pos.x > canvas.getWidth() + 20 || b.pos.y > canvas.getHeight() + 20 ||
+                b.pos.x < -20 || b.pos.y < -20) {
+                bulletCPU.remove(i);
+                enemy.ammo = 0;
+                continue;
             }
 
-            for (int i = 0; i < bulletCPU.size(); i++) {
-                if(avatars.size() != 0){
-                   if(bulletCPU.get(i).circle.intersects(avatars.get(0).rectangle.getBoundsInParent())){
-                       bulletCPU.remove(i);
-                       enemy.ammo = 0;
-                       avatars.get(0).live--;
-                       if(avatars.get(0).live == 0){
-                           avatars.remove(0);
-                       }
-                   }
-                }
-                if(avatarTwos.size() != 0){
-                    if(bulletCPU.get(i).circle.intersects(avatarTwos.get(0).rectangle.getBoundsInParent())){
-                        bulletCPU.remove(i);
-                        enemy.ammo = 0;
-                        avatarTwos.get(0).live--;
-                        if(avatarTwos.get(0).live == 0){
-                            avatarTwos.remove(0);
-                        }
-                    }
-                }
-
-
+            if (!avatars.isEmpty() && b.circle.intersects(avatars.get(0).rectangle.getBoundsInParent())) {
+                avatars.get(0).live--;
+                if (avatars.get(0).live <= 0) avatars.remove(0);
+                bulletCPU.remove(i);
+                enemy.ammo = 0;
+                continue;
             }
 
-
-
-            if (!stopflag) {
-                enemy.moveForward();
-                stopBullets = false;
+            if (!avatarTwos.isEmpty() && b.circle.intersects(avatarTwos.get(0).rectangle.getBoundsInParent())) {
+                avatarTwos.get(0).live--;
+                if (avatarTwos.get(0).live <= 0) avatarTwos.remove(0);
+                bulletCPU.remove(i);
+                enemy.ammo = 0;
+                continue;
             }
+        }
 
-
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-        }).start();
-
+        if (!stopflag) {
+            enemy.moveForward();
+        }
     }
 }
-
-
-
-
-
-
-
-
